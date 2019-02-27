@@ -1,4 +1,5 @@
-import {renderFilters, renderPoints} from './filters';
+import {renderFilters} from './filters';
+import {renderPoints} from './points';
 
 const pointsAmount = 7;
 

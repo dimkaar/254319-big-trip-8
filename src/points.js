@@ -23,7 +23,7 @@ const createPoint = (icon, title, time, duration, price, offers) => {
         </article>`;
 };
 
-const renderPoints = (amount) => {
+export const renderPoints = (amount) => {
   let content = ``;
   let i = 0;
 
@@ -34,5 +34,3 @@ const renderPoints = (amount) => {
 
   render(pointsRoot, content);
 };
-
-export default renderPoints;

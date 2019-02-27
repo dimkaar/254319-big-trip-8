@@ -1,5 +1,5 @@
 import {render} from './constants.js';
-import {default as renderPoints} from './points.js';
+import {renderPoints} from './points.js';
 
 const FILTERS_NAMES = [`Everything`, `Future`, `Past`];
 
@@ -37,6 +37,3 @@ export const renderFilters = () => {
 
   render(filtersRoot, content);
 };
-
-export {default as renderPoints} from './points';
-
