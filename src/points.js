@@ -1,4 +1,5 @@
-import {render} from './constants';
+import {render} from "./constants";
+import {getCardData} from "./data";
 
 const pointsRoot = document.querySelector(`.trip-day__items`);
 
