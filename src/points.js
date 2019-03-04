@@ -45,7 +45,7 @@ export const renderPoints = (amount) => {
       return Object.keys(typesObj)[getRandomIntegerFromInterval(0, Object.keys(typesObj).length - 1)];
     };
 
-    const getDateFromStr = (string) => new Date(0, 0,0, string.split(`:`)[0], string.split(`:`)[1]);
+    const getDateFromStr = (string) => new Date(0, 0, 0, string.split(`:`)[0], string.split(`:`)[1]);
 
     const countDuration = () => {
       const firstTime = time.split(`–`)[0];
