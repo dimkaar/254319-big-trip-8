@@ -1,7 +1,42 @@
-import {getRandomIntegerFromInterval, render, Units} from "./constants";
+import {getRandomIntegerFromInterval, createElement, Units} from "./constants";
 import {getCardData} from "./data";
 
 const pointsRoot = document.querySelector(`.trip-day__items`);
+
+class Point {
+  constructor(data) {
+    this._icon = data.type;
+    this._title = data.text;
+    this._time = data.time;
+    this._duration = data.duration;
+    this._price = data.price;
+    this._offers = data.offers;
+
+    this._element = null;
+    this.onEdit = null;
+  }
+
+  get template() {
+    return `<article class="trip-point">
+          <i class="trip-icon">${this._icon}</i>
+          <h3 class="trip-point__title">${this._title}</h3>
+          <p class="trip-point__schedule">
+            <span class="trip-point__timetable">${this._time}</span>
+            <span class="trip-point__duration">${this._duration}</span>
+          </p>
+          <p class="trip-point__price">${this._price}&euro;</p>
+          <ul class="trip-point__offers">
+            ${[...this._offers].map((offer) => `<li><button class="trip-point__offer">${offer}</button></li>`).join(``)}
+          </ul>
+        </article>`;
+  }
+
+  render() {
+    this._element = createElement(this.template);
+    this.bind();
+    return this._element;
+  }
+}
 
 const createPoint = (data) => {
   return `<article class="trip-point">
@@ -19,7 +54,6 @@ const createPoint = (data) => {
 };
 
 export const renderPoints = (amount) => {
-  let content = ``;
   let i = 0;
   const dataArr = [];
   let tmpData;
@@ -75,9 +109,6 @@ export const renderPoints = (amount) => {
   while (i < amount) {
     tmpData = getCardData();
     dataArr.push(tmpData);
-    content += createPoint(parseData(tmpData));
     i++;
   }
-
-  render(pointsRoot, content);
 };
