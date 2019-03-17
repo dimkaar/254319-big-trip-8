@@ -1,39 +1,89 @@
-import {render} from './constants.js';
-import {renderPoints} from './points.js';
+import {createElement} from "./constants";
 
-const FILTERS_NAMES = [`Everything`, `Future`, `Past`];
+export class FilterInput {
+  constructor(data) {
+    this._name = data.name;
+    this._checked = this._getRandomInt(0, 2);
+    this._disabled = this._getRandomInt(0, 0);
 
-const filtersRoot = document.querySelector(`.trip-filter`);
-const maxCardsAmount = 20;
+    this._element = null;
+  }
 
-const getRandomInt = (min, max) => Math.floor(Math.random() * (max - min)) + min;
-
-const createFilter = (name, checked = false, disabled = false) => {
-  return `<input 
+  get template() {
+    return `<input 
           type="radio" 
-          id="filter-${name.toLowerCase()}" 
+          id="filter-${this._name.toLowerCase()}" 
           name="filter" 
-          value="${name.toLowerCase()}"
-          ${ checked ? `checked` : ``} 
-          ${ disabled ? `disabled` : ``} 
-          >
-          <label 
+          value="${this._name.toLowerCase()}"
+          ${ this._checked ? `checked` : ``} 
+          ${ this._disabled ? `disabled` : ``} 
+          >`;
+  }
+
+  _getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min)) + min;
+  }
+
+  render() {
+    this._element = createElement(this.template);
+    return this._element;
+  }
+
+  unrender() {
+    this._element = null;
+  }
+}
+
+export class FilterLabel {
+  constructor(data) {
+    this._name = data.name;
+    this._checked = this._getRandomInt(0, 1);
+    this._disabled = this._getRandomInt(0, 1);
+
+    this._element = null;
+
+    this._filterClickHandler = this._filterClickHandler.bind(this);
+  }
+
+  get template() {
+    return `<label 
           class="trip-filter__item" 
-          for="filter-${name.toLowerCase()}"
+          for="filter-${this._name.toLowerCase()}"
           >
-          ${name}
+          ${this._name}
           </label>`;
-};
+  }
 
-export const renderFilters = () => {
-  let content = ``;
-  FILTERS_NAMES.forEach((name) => {
-    content += createFilter(name);
-  });
+  set clickHandler(fn) {
+    this._clickHandler = fn;
+  }
 
-  filtersRoot.addEventListener(`click`, () => {
-    renderPoints(getRandomInt(0, maxCardsAmount));
-  });
+  _getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min)) + min;
+  }
 
-  render(filtersRoot, content);
-};
+  _filterClickHandler() {
+    if (typeof this._clickHandler === `function`) {
+      this._clickHandler();
+    }
+  }
+
+  bind() {
+    this._element.addEventListener(`click`, this._filterClickHandler);
+  }
+
+  unbind() {
+    this._element.removeEventListener(`click`, this._filterClickHandler);
+  }
+
+  render() {
+    this._element = createElement(this.template);
+    this.bind();
+    return this._element;
+  }
+
+  unrender() {
+    this.unbind();
+    this._element = null;
+  }
+}

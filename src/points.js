@@ -1,19 +1,49 @@
 import {getRandomIntegerFromInterval, createElement, Units} from "./constants";
-import {getCardData} from "./data";
+import {PointEdit} from "./pointEdit";
 
 const pointsRoot = document.querySelector(`.trip-day__items`);
 
-class Point {
+export class Point {
   constructor(data) {
-    this._icon = data.type;
+    this._type = this._getRandomType(data.type);
+    this._icon = data.type[this._type];
     this._title = data.text;
     this._time = data.time;
-    this._duration = data.duration;
+    this._duration = this._countDuration(this._time);
     this._price = data.price;
     this._offers = data.offers;
 
     this._element = null;
-    this.onEdit = null;
+    this._editHandler = null;
+
+    this._pointClickHandler = this._pointClickHandler.bind(this);
+  }
+
+  _getRandomType(typesObj) {
+    return Object.keys(typesObj)[getRandomIntegerFromInterval(0, Object.keys(typesObj).length - 1)];
+  }
+
+  _getDateFromStr(string) {
+    return new Date(0, 0, 0, string.split(`:`)[0], string.split(`:`)[1]);
+  }
+
+  _countDuration() {
+    const firstTime = this._time.split(`–`)[0];
+    const secondTime = this._time.split(`–`)[this._time.split(`–`).length - 1];
+
+    let difference = (this._getDateFromStr(secondTime) - this._getDateFromStr(firstTime));
+    if (difference < 0) {
+      difference += Units.hoursInDay * Units.minutesInHour * Units.secondsInMinute * Units.millisecondsInSecond;
+    }
+
+    let hours = Math.floor((difference % 86400000) / 3600000);
+    let minutes = Math.round(((difference % 86400000) % 3600000) / 60000);
+    let result = hours + `h ` + minutes + `m`;
+    return result;
+  };
+
+  get element() {
+    return this._element;
   }
 
   get template() {
@@ -31,84 +61,64 @@ class Point {
         </article>`;
   }
 
+  set editHandler(fn) {
+    this._editHandler = fn;
+  }
+
+  _pointClickHandler() {
+    if (typeof this._editHandler === `function`) {
+      this._editHandler();
+    }
+  }
+
+  bind() {
+    this._element.addEventListener(`click`, this._pointClickHandler);
+  }
+
+  unbind() {
+    this._element.removeEventListener(`click`, this._pointClickHandler);
+  }
+
   render() {
     this._element = createElement(this.template);
     this.bind();
     return this._element;
   }
+
+  unrender() {
+    this.unbind();
+    this._element = null;
+  }
 }
 
-const createPoint = (data) => {
-  return `<article class="trip-point">
-          <i class="trip-icon">${data.type}</i>
-          <h3 class="trip-point__title">${data.text}</h3>
-          <p class="trip-point__schedule">
-            <span class="trip-point__timetable">${data.time}</span>
-            <span class="trip-point__duration">${data.duration}</span>
-          </p>
-          <p class="trip-point__price">${data.price}&euro;</p>
-          <ul class="trip-point__offers">
-            ${[...data.offers].map((offer) => `<li><button class="trip-point__offer">${offer}</button></li>`).join(``)}
-          </ul>
-        </article>`;
-};
 
-export const renderPoints = (amount) => {
+export const renderPoints = (data) => {
+  pointsRoot.innerHTML = ``;
+  let fragment = document.createDocumentFragment();
   let i = 0;
-  const dataArr = [];
-  let tmpData;
-
-  const parseData = (data) => {
-    let time;
-
-    const getPointTime = (date) => {
-      return new Date(date).getHours() + Units.startUnit + `:` + new Date(date).getMinutes() + `–` + getRandomIntegerFromInterval(0, Units.hoursInDay) + `:` + getRandomIntegerFromInterval(new Date(date).getMinutes(), (Units.minutesInHour - Units.startUnit));
+  while (i < data.length) {
+    let point = new Point(data[i]);
+    let pointEdit = new PointEdit(data[i]);
+    point.editHandler = () => {
+      pointEdit.render();
+      pointsRoot.replaceChild(pointEdit.element, point.element);
+      point.unrender();
     };
 
-    const replaceText = (str, search, replacement) => {
-      return str.split(search).join(replacement);
+    pointEdit.submitHandler = () => {
+      point.render();
+      pointsRoot.replaceChild(point.element, pointEdit.element);
+      pointEdit.unrender();
     };
 
-    time = getPointTime(data.date);
-
-    if (~time.indexOf(`24`)) {
-      time = replaceText(time, `24`, `00`);
-    }
-
-    const getRandomType = (typesObj) => {
-      return Object.keys(typesObj)[getRandomIntegerFromInterval(0, Object.keys(typesObj).length - 1)];
+    pointEdit.resetHandler = () => {
+      pointsRoot.removeChild(pointEdit.element);
+      pointEdit.unrender();
     };
 
-    const getDateFromStr = (string) => new Date(0, 0, 0, string.split(`:`)[0], string.split(`:`)[1]);
-
-    const countDuration = () => {
-      const firstTime = time.split(`–`)[0];
-      const secondTime = time.split(`–`)[time.split(`–`).length - 1];
-
-      let difference = (getDateFromStr(secondTime) - getDateFromStr(firstTime));
-
-      let hours = Math.floor((difference % 86400000) / 3600000);
-      let minutes = Math.round(((difference % 86400000) % 3600000) / 60000);
-      let result = hours + `h ` + minutes + `m`;
-      return result;
-    };
-
-    return {
-      type: data.type[getRandomType(data.type)],
-      city: data.cities,
-      picture: data.picture,
-      offers: data.offers,
-      text: data.text,
-      date: new Date(data.date),
-      time,
-      duration: countDuration(),
-      price: data.price
-    };
-  };
-
-  while (i < amount) {
-    tmpData = getCardData();
-    dataArr.push(tmpData);
+    fragment.appendChild(point.render());
     i++;
   }
+
+  pointsRoot.appendChild(fragment);
 };

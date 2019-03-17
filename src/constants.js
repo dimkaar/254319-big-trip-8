@@ -7,10 +7,20 @@ export const Units = {
   startUnit: 1,
 };
 
+export const FILTERS_NAMES = [`Everything`, `Future`, `Past`];
+
 export const getRandomIntegerFromInterval = (min, max) => Math.round(min - 0.5 + Math.random() * (max - min + 1));
 
 export const createElement = (template) => {
   const newElement = document.createElement(`div`);
   newElement.innerHTML = template;
   return newElement.firstChild;
+};
+
+export const render = (root, content) => {
+  root.innerHTML = content;
+};
+
+export const replaceText = (str, search, replacement) => {
+  return str.split(search).join(replacement);
 };
