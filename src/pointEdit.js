@@ -41,7 +41,7 @@ export class PointEdit {
     let minutes = Math.round(((difference % 86400000) % 3600000) / 60000);
     let result = hours + `h ` + minutes + `m`;
     return result;
-  };
+  }
 
   get element() {
     return this._element;
