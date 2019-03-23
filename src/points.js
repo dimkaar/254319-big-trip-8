@@ -1,17 +1,15 @@
-import {getRandomIntegerFromInterval, createElement, Units} from "./constants";
-import {PointEdit} from "./pointEdit";
-
-const pointsRoot = document.querySelector(`.trip-day__items`);
+import {createElement, TYPES, Units} from "./constants";
 
 export class Point {
   constructor(data) {
-    this._type = this._getRandomType(data.type);
-    this._icon = data.type[this._type];
+    this._type = data.type;
+    this._icon = TYPES[this._type];
     this._title = data.text;
     this._time = data.time;
     this._duration = this._countDuration(this._time);
     this._price = data.price;
     this._offers = data.offers;
+    this._chosenOffers = [...data.chosenOffers];
 
     this._element = null;
     this._editHandler = null;
@@ -19,9 +17,6 @@ export class Point {
     this._pointClickHandler = this._pointClickHandler.bind(this);
   }
 
-  _getRandomType(typesObj) {
-    return Object.keys(typesObj)[getRandomIntegerFromInterval(0, Object.keys(typesObj).length - 1)];
-  }
 
   _getDateFromStr(string) {
     return new Date(0, 0, 0, string.split(`:`)[0], string.split(`:`)[1]);
@@ -56,7 +51,7 @@ export class Point {
           </p>
           <p class="trip-point__price">${this._price}&euro;</p>
           <ul class="trip-point__offers">
-            ${[...this._offers].map((offer) => `<li><button class="trip-point__offer">${offer}</button></li>`).join(``)}
+            ${ this._chosenOffers.map((offer) => `<li><button class="trip-point__offer">${offer} +&euro;&nbsp;${ this._offers[offer]}</button></li>`).join(``) }
           </ul>
         </article>`;
   }
@@ -90,35 +85,3 @@ export class Point {
     this._element = null;
   }
 }
-
-
-export const renderPoints = (data) => {
-  pointsRoot.innerHTML = ``;
-  let fragment = document.createDocumentFragment();
-  let i = 0;
-  while (i < data.length) {
-    let point = new Point(data[i]);
-    let pointEdit = new PointEdit(data[i]);
-    point.editHandler = () => {
-      pointEdit.render();
-      pointsRoot.replaceChild(pointEdit.element, point.element);
-      point.unrender();
-    };
-
-    pointEdit.submitHandler = () => {
-      point.render();
-      pointsRoot.replaceChild(point.element, pointEdit.element);
-      pointEdit.unrender();
-    };
-
-    pointEdit.resetHandler = () => {
-      pointsRoot.removeChild(pointEdit.element);
-      pointEdit.unrender();
-    };
-
-    fragment.appendChild(point.render());
-    i++;
-  }
-
-  pointsRoot.appendChild(fragment);
-};

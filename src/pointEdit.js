@@ -1,15 +1,16 @@
-import {getRandomIntegerFromInterval, createElement, Units} from "./constants";
+import {createElement, Units, TYPES} from "./constants";
 
 export class PointEdit {
   constructor(data) {
-    this._type = this._getRandomType(data.type);
-    this._icon = data.type[this._type];
+    this._type = data.type;
+    this._icon = TYPES[this._type];
     this._title = data.text;
     this._time = data.time;
     this._duration = this._countDuration(data.duration);
     this._city = data.city;
     this._price = data.price;
     this._offers = data.offers;
+    this._chosenOffers = [...data.chosenOffers];
     this._picture = data.picture;
 
     this._element = null;
@@ -18,10 +19,6 @@ export class PointEdit {
 
     this._submitButtonClickHandler = this._submitButtonClickHandler.bind(this);
     this._resetButtonClickHandler = this._resetButtonClickHandler.bind(this);
-  }
-
-  _getRandomType(typesObj) {
-    return Object.keys(typesObj)[getRandomIntegerFromInterval(0, Object.keys(typesObj).length - 1)];
   }
 
   _getDateFromStr(string) {
@@ -124,10 +121,10 @@ export class PointEdit {
         <h3 class="point__details-title">offers</h3>
 
         <div class="point__offers-wrap">
-            ${[...this._offers].map((offer) => `<input class="point__offers-input visually-hidden" type="checkbox" id="${offer.split(` `).join(`-`).toLocaleLowerCase()}" name="offer" value="${offer.split(` `).join(`-`).toLocaleLowerCase()}">
+            ${ Object.keys(this._offers).map((offer) => `<input class="point__offers-input visually-hidden" type="checkbox" id="${offer.split(` `).join(`-`).toLocaleLowerCase()}" name="offer" value="${offer.split(` `).join(`-`).toLocaleLowerCase()}" ${ ~this._chosenOffers.indexOf(offer) ? `checked` : `` }>
                     <label for="${offer.split(` `).join(`-`).toLocaleLowerCase()}" class="point__offers-label">
-                <span class="point__offer-service">${offer}</span> + €<span class="point__offer-price">30</span>
-            </label>`).join(``)}
+                <span class="point__offer-service">${offer}</span> + &euro;<span class="point__offer-price">${ this._offers[offer] }</span>
+            </label>`).join(``) }
         </div>
   
         </section>

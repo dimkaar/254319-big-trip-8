@@ -9,6 +9,21 @@ export const Units = {
 
 export const FILTERS_NAMES = [`Everything`, `Future`, `Past`];
 
+export const TYPES = {
+  'Taxi': `🚕`,
+  'Bus': `🚌`,
+  'Train': `🚂`,
+  'Ship': `🛳️`,
+  'Transport': `🚊`,
+  'Drive': `🚗`,
+  'Flight': `✈️`,
+  'Check-in': `🏨`,
+  'Sightseeing': `🏛️`,
+  'Restaurant': `🍴`,
+};
+
+export const OFFERS = [`Add luggage`, `Switch to comfort class`, `Add meal`, `Choose seats`];
+
 export const getRandomIntegerFromInterval = (min, max) => Math.round(min - 0.5 + Math.random() * (max - min + 1));
 
 export const createElement = (template) => {
