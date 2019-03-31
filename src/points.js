@@ -1,7 +1,9 @@
-import {createElement, TYPES, Units} from "./constants";
+import {TYPES, Units} from "./constants";
+import {Component} from "./component";
 
-export class Point {
+export class Point extends Component {
   constructor(data) {
+    super();
     this._type = data.type;
     this._icon = TYPES[this._type];
     this._title = data.text;
@@ -11,7 +13,6 @@ export class Point {
     this._offers = data.offers;
     this._chosenOffers = [...data.chosenOffers];
 
-    this._element = null;
     this._editHandler = null;
 
     this._pointClickHandler = this._pointClickHandler.bind(this);
@@ -35,10 +36,6 @@ export class Point {
     let minutes = Math.round(((difference % 86400000) % 3600000) / 60000);
     let result = hours + `h ` + minutes + `m`;
     return result;
-  }
-
-  get element() {
-    return this._element;
   }
 
   get template() {
@@ -72,16 +69,5 @@ export class Point {
 
   unbind() {
     this._element.removeEventListener(`click`, this._pointClickHandler);
-  }
-
-  render() {
-    this._element = createElement(this.template);
-    this.bind();
-    return this._element;
-  }
-
-  unrender() {
-    this.unbind();
-    this._element = null;
   }
 }

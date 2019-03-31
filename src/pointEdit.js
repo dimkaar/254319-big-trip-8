@@ -1,7 +1,9 @@
-import {createElement, Units, TYPES} from "./constants";
+import {Units, TYPES} from "./constants";
+import {Component} from "./component";
 
-export class PointEdit {
+export class PointEdit extends Component {
   constructor(data) {
+    super();
     this._type = data.type;
     this._icon = TYPES[this._type];
     this._title = data.text;
@@ -13,7 +15,6 @@ export class PointEdit {
     this._chosenOffers = [...data.chosenOffers];
     this._picture = data.picture;
 
-    this._element = null;
     this._submitHandler = null;
     this._resetHandler = null;
 
@@ -38,10 +39,6 @@ export class PointEdit {
     let minutes = Math.round(((difference % 86400000) % 3600000) / 60000);
     let result = hours + `h ` + minutes + `m`;
     return result;
-  }
-
-  get element() {
-    return this._element;
   }
 
   get template() {
@@ -171,16 +168,5 @@ export class PointEdit {
   unbind() {
     this._element.querySelector(`form`).removeEventListener(`submit`, this._submitButtonClickHandler);
     this._element.querySelector(`.point__button:not(.point__button--save)`).removeEventListener(`click`, this._resetButtonClickHandler);
-  }
-
-  render() {
-    this._element = createElement(this.template);
-    this.bind();
-    return this._element;
-  }
-
-  unrender() {
-    this.unbind();
-    this._element = null;
   }
 }
